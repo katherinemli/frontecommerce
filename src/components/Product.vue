@@ -7,8 +7,9 @@
         <q-btn
           fab
           color="primary"
-          icon="place"
+          icon="add_shopping_cart"
           class="absolute"
+          @click="onClickButton"
           style="top: 0; right: 12px; transform: translateY(-50%);"
         />
 
@@ -17,8 +18,8 @@
            {{name}}
           </div>
           <div class="col-auto text-grey text-caption q-pt-md row no-wrap items-center">
-            <q-icon name="place" />
-            250 ft
+            <q-icon name="shopping_bag" />
+            100 left
           </div>
         </div>
       </q-card-section>
@@ -31,15 +32,6 @@
 
         </div>
       </q-card-section>
-
-      <q-separator />
-
-      <q-card-actions>
-        <q-btn flat round icon="event" />
-        <q-btn flat color="primary">
-          Reserve:
-        </q-btn>
-      </q-card-actions>
     </q-card>
 </template>
 
@@ -54,6 +46,12 @@ const props = {
     type: String,
     default: '',
   },
+  cart: {
+    type: Object,
+    default() {
+      return {};
+    },
+  },
 };
 export default {
   props,
@@ -61,6 +59,13 @@ export default {
   data() {
     return {
     };
+  },
+  methods: {
+    onClickButton(event) {
+      console.log('clicked', event);
+      this.$emit('clicked', 'someValue');
+    },
+
   },
   watch: {
   },

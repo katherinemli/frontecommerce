@@ -2,32 +2,31 @@
   <q-layout view="hHr lpR fFf">
     <q-header reveal class="bg-primary text-white">
       <q-toolbar>
-        <q-btn
+        <!--         <q-btn
           flat
           dense
           round
           icon="menu"
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
-        />
+        /> -->
 
-        <q-toolbar-title>
+        <q-toolbar-title @click="toIndex">
           <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
+            <q-icon :size="'md'" name="favorite" />
           </q-avatar>
-          Quasar App
+          Katherine&TripElephant
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>
+          <q-icon @click="toShoppingCart" size="lg" name="shopping_cart" color="white">
+            <q-badge color="positive" floating>{{ productInCart }}</q-badge>
+          </q-icon>
+        </div>
       </q-toolbar>
     </q-header>
     <q-drawer v-model="leftDrawerOpen" side="left">
       <!-- drawer content -->
-        <div
-          v-for="product in listProducts"
-          :key="product.id">
-          {{product.name}}
-      </div>
     </q-drawer>
     <q-page-container>
       <router-view />
@@ -92,21 +91,27 @@ export default {
   },
   data() {
     return {
-      leftDrawerOpen: true,
+      leftDrawerOpen: false,
       essentialLinks: linksData,
-      listProducts: [],
+      productInCart: 0,
     };
   },
   methods: {
     loadData() {
-      api.get('/api/')
+      api.get('/cart/2')
         .then((response) => {
-          console.log('response: ', response);
-          this.listProducts = response.data;
+          console.log('cartMainLayout Number:: ', response.data.product.length);
+          this.productInCart = response.data.product.length;
         })
         .catch(() => {
           console.log('error: ');
         });
+    },
+    toShoppingCart() {
+      this.$router.push('/cart');
+    },
+    toIndex() {
+      this.$router.push('/');
     },
   },
 };

@@ -5,6 +5,12 @@
   min-height: 440px;
   flex: 1 0 21%;
 }
+.shop-number {
+  color: #fff;
+}
+.q-icon .q-badge {
+  font-family: Roboto,-apple-system,Helvetica Neue,Helvetica,Arial,sans-serif;
+}
 .body-cards {
   display: flex;
 
@@ -12,7 +18,26 @@
   flex-wrap: wrap;
 
 }
+#lblCartCount {
+  font-size: 12px;
+  background: #ff0000;
+  color: #fff;
+  padding: 0 5px;
+  vertical-align: top;
+  margin-left: -10px;
+}
+.badge {
+padding-left: 9px;
+padding-right: 9px;
+-webkit-border-radius: 9px;
+-moz-border-radius: 9px;
+border-radius: 9px;
+}
 
+.label-warning[href],
+.badge-warning[href] {
+background-color: #c67605;
+}
 @media (max-width: $breakpoint-xs-max){
   .cards-item  {
     flex-basis: 100%;
