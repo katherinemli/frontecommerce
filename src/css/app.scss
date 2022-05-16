@@ -1,0 +1,21 @@
+// app global css in SCSS form
+.cards-item {
+  height: 30vh;
+  min-width: 100px;
+  min-height: 440px;
+  flex: 1 0 21%;
+}
+.body-cards {
+  display: flex;
+
+
+  flex-wrap: wrap;
+
+}
+
+@media (max-width: $breakpoint-xs-max){
+  .cards-item  {
+    flex-basis: 100%;
+    height: 520px;
+  }
+}
