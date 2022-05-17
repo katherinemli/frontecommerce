@@ -3,9 +3,14 @@
 
     <q-list v-model="dataLoaded">
       <div v-for="product in productsData" :key="product.id">
-        <q-item>
+        <q-item v-if="product.inventory_left>0">
           <q-item-section>
-            <q-item-label>{{ product.name }}</q-item-label>
+            <q-item-label class="flex">
+              <q-icon name="delete" color="red" />
+              <div>
+                {{ product.name }}
+              </div>
+              </q-item-label>
             <q-item-label caption lines="2">
               {{ product.description }}
             </q-item-label>
@@ -17,11 +22,32 @@
           <q-item-section side top>
             <q-item-label caption>
               ${{ product.price }}
-              <q-icon name="delete" color="red" />
             </q-item-label>
           </q-item-section>
         </q-item>
+        <q-item v-else>
+          <q-item-section>
+            <q-item-label class="flex">
+              <q-icon name="delete" color="red" />
+              <div>
+                {{ product.name }}
+              </div>
+              </q-item-label>
+            <q-item-label caption lines="2">
+              {{ product.description }}
+            </q-item-label>
+            <q-item-label caption lines="2">
+             <div
+             class="text-overline text-red-9">No stock of this product.</div>
+            </q-item-label>
+          </q-item-section>
 
+          <q-item-section side top>
+            <q-item-label style="text-decoration: line-through;" caption>
+              ${{ product.price }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
         <q-separator spaced inset />
       </div>
       <q-item class="total-price">
@@ -55,15 +81,19 @@
         <q-item-section class="body-btn-car">
           <q-btn outline color="primary" label="Store" />
           <q-btn @click="buyAction" color="primary"
-          :disable="!isValidCard || !isValidAddress"  label="Buy" />
+          :disable="!isValidCard || !isValidAddress || buyOn"  label="Buy" />
         </q-item-section>
       </q-item>
     </q-list>
+    <div v-if="!dataLoaded">
+      cargando
+    </div>
   </q-page>
 </template>
 
 <script>
 import { api } from 'boot/axios';
+// outside of a Vue file
 
 export default {
   name: 'Cart',
@@ -86,6 +116,7 @@ export default {
       separator2: 'separator2',
       cartData: {},
       allDataBuy: false,
+      buyOn: false,
     };
   },
   computed: {
@@ -124,7 +155,9 @@ export default {
         .then(this.$axios.spread((...responseProduct) => {
           this.productsData = responseProduct.map((element) => {
             console.log('elemn:', element);
-            this.totalPrice += element.data.price;
+            if (element.data.inventory_left > 0) {
+              this.totalPrice += element.data.price;
+            }
             return element.data;
           });
         }))
@@ -165,6 +198,7 @@ export default {
         });
     },
     buyAction() {
+      this.buyOn = true;
       const objPostCart = {
         id: this.cardData.id,
         price: this.cartData.price,
@@ -177,6 +211,17 @@ export default {
         api.put('/cart/2/', objPostCart)
           .then((response) => {
             console.log('response: ', response);
+            this.buyOn = false;
+            this.totalPrice = 0;
+            this.$q.notify(
+              {
+                type: 'positive',
+                message: 'SUCCESSFUL PURCHASE',
+              },
+            );
+            this.productsData = this.productsData.filter(
+              (value) => value.inventory_left === 0,
+            );
           });
       }
     },
