@@ -122,7 +122,7 @@ export default {
       if (this.card) {
         const indices = this.getIndicesOf('_', this.card);
         console.log(' mystring:', indices);
-        if (indices.length !== 0) {
+        if (indices.length === 0) {
           return true;
         }
       }
@@ -217,9 +217,30 @@ export default {
 
     addCart(product) {
       console.log('cart');
+
       api.put('/cart/2', product)
         .then((response) => {
           console.log('response: ', response);
+        });
+    },
+    inventoryAction() {
+      const urlProducts = [];
+      const productsDataId = this.productsData.filter(
+        (obj) => obj.inventory_left > 0,
+      )
+        .map((obj) => {
+          this.totalPrice += obj.price;
+          return obj.id;
+        });
+      productsDataId.forEach((idProduct) => {
+        console.log('idProduct:', `/product/${this.idProduct}/`);
+        urlProducts.push(api.put(`/product/${idProduct}/`));
+      });
+      this.$axios.all(urlProducts)
+        .then(this.$axios.spread(() => {
+        }))
+        .catch((error) => {
+          console.error(error);
         });
     },
     buyAction() {
@@ -238,6 +259,7 @@ export default {
             console.log('response: ', response);
             this.buyOn = false;
             this.totalPrice = 0;
+            this.inventoryAction();
             this.$q.notify(
               {
                 type: 'positive',
