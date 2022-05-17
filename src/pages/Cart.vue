@@ -1,24 +1,24 @@
 <template>
- <q-page class="q-pa-md">
-   {{listProducts}}
- <q-list v-model="dataLoaded">
- <div  v-for="product in listProducts" :key="product.id">
-      <q-item>
-        <q-item-section>
-          <q-item-label>Single line item</q-item-label>
-          <q-item-label caption lines="2">
-            Secondary line text. Lorem ipsum dolor sit amet, consectetur adipiscit elit.
+  <q-page class="q-pa-md">
+
+    <q-list v-model="dataLoaded">
+      <div v-for="product in productsData" :key="product.id">
+        <q-item>
+          <q-item-section>
+            <q-item-label>{{ product.name }}</q-item-label>
+            <q-item-label caption lines="2">
+              {{ product.description }}
             </q-item-label>
-        </q-item-section>
+          </q-item-section>
 
-        <q-item-section side top>
-          <q-item-label caption>5 min ago</q-item-label>
-          <q-icon name="star" color="yellow" />
-        </q-item-section>
-      </q-item>
+          <q-item-section side top>
+            <q-item-label caption>5 min ago</q-item-label>
+            <q-icon name="star" color="yellow" />
+          </q-item-section>
+        </q-item>
 
-      <q-separator spaced inset />
-    </div>
+        <q-separator spaced inset />
+      </div>
 
     </q-list>
   </q-page>
@@ -32,24 +32,36 @@ export default {
   data() {
     return {
       listProducts: [],
+      productsData: [],
       dataLoaded: false,
     };
   },
+  created() {
+    api.get('/cart/2').then((response) => {
+      console.log('axios1:', response);
+      this.listProducts = response.data.product;
+      this.dataLoaded = true;
+      const urlProducts = [];
+      this.listProducts.forEach((idProduct) => {
+        console.log('idProduct:', `/product/${this.idProduct}`);
+        urlProducts.push(api.get(`/product/${idProduct}`));
+      });
+      this.$axios.all(urlProducts)
+        .then(this.$axios.spread((...responseProduct) => {
+          this.productsData = responseProduct.map((element) => {
+            console.log('elemn:', element);
+            return element.data;
+          });
+        }))
+        .catch((error) => {
+          console.error(error);
+        });
+    });
+  },
   beforeMount() {
-    this.loadData();
+    // this.loadData();
   },
   methods: {
-    loadData() {
-      api.get('/cart/2')
-        .then((response) => {
-          console.log('cart: ', response);
-          this.listProducts = response.data.product;
-          this.dataLoaded = true;
-        })
-        .catch(() => {
-          console.log('error: ');
-        });
-    },
     addCart(product) {
       console.log('cart');
       api.put('/cart/2', product)

@@ -19,7 +19,7 @@
           </div>
           <div class="col-auto text-grey text-caption q-pt-md row no-wrap items-center">
             <q-icon name="shopping_bag" />
-            100 left
+            {{inventory}} left
           </div>
         </div>
       </q-card-section>
@@ -29,7 +29,7 @@
          {{description}}
         </div>
         <div class="text-caption text-grey">
-
+          {{price}}
         </div>
       </q-card-section>
     </q-card>
@@ -38,6 +38,10 @@
 <script>
 
 const props = {
+  id: {
+    type: Number,
+    default: 0,
+  },
   name: {
     type: String,
     default: '',
@@ -45,6 +49,14 @@ const props = {
   description: {
     type: String,
     default: '',
+  },
+  price: {
+    type: Number,
+    default: 0,
+  },
+  inventory: {
+    type: Number,
+    default: 0,
   },
   cart: {
     type: Object,
@@ -61,9 +73,9 @@ export default {
     };
   },
   methods: {
-    onClickButton(event) {
-      console.log('clicked', event);
-      this.$emit('clicked', 'someValue');
+    onClickButton() {
+      console.log('this.id', this.id);
+      this.$emit('clicked', this.id);
     },
 
   },

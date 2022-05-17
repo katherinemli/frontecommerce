@@ -29,7 +29,8 @@
       <!-- drawer content -->
     </q-drawer>
     <q-page-container>
-      <router-view />
+      <router-view
+       @updateProductCount="onClickAdd"/>
     </q-page-container>
   </q-layout>
 </template>
@@ -97,6 +98,10 @@ export default {
     };
   },
   methods: {
+    onClickAdd(value) {
+      console.log('se agrego un producto', value);
+      this.productInCart += value;
+    },
     loadData() {
       api.get('/cart/2')
         .then((response) => {
