@@ -9,6 +9,9 @@
             <q-item-label caption lines="2">
               {{ product.description }}
             </q-item-label>
+            <q-item-label caption lines="2">
+              {{ product.inventory_left }}
+            </q-item-label>
           </q-item-section>
 
           <q-item-section side top>
@@ -31,37 +34,28 @@
       <q-item class="total-price">
         <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
       </q-item>
-      <transition-group
-        appear
-        enter-active-class="animated fadeIn"
-        leave-active-class="animated fadeOut"
-      >
-       <q-separator  v-bind:key="separator" size="0.15rem" spaced inset />
-      <q-item v-bind:key="inputAddres">
-        <q-input bottom-slots v-model="text" label="Label" counter :dense="dense">
-          <template v-slot:prepend>
-            <q-icon name="place" />
-          </template>
-          <template v-slot:append>
-            <q-icon name="close" @click="text = ''" class="cursor-pointer" />
-          </template>
-
-          <template v-slot:hint>
-            Field hint
-          </template>
-        </q-input>
-      </q-item>
-      <q-item v-bind:key="cardData">
-        <q-input v-model="card"
-        label="Card" mask="#### #### #### ####" fill-mask="0" hint="Card Number" />
-      </q-item>
-      <q-separator v-bind:key="separator2" size="0.15rem" spaced inset />
+      <transition-group appear enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut">
+        <q-separator v-bind:key="separator" size="0.15rem" spaced inset />
+        <q-item class="data-buy" v-bind:key="inputAddres">
+          <q-input v-model="address"
+          :error="!isValidAddress"
+          error-message="Required" label="Address"
+            hint="Address" />
+        </q-item>
+        <q-item class="data-buy" v-bind:key="cardData">
+          <q-input v-model="card"
+          error-message="Required" :error="!isValidCard" label="Card"
+            mask="#### #### #### ####" fill-mask="" hint="Card Number" />
+        </q-item>
+        <q-separator v-bind:key="separator2" size="0.15rem" spaced inset />
 
       </transition-group>
       <q-item>
         <q-item-section class="body-btn-car">
           <q-btn outline color="primary" label="Store" />
-          <q-btn @click="buyAction" color="primary" label="Buy" />
+          <q-btn @click="buyAction" color="primary"
+          :disable="!isValidCard || !isValidAddress"  label="Buy" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -90,7 +84,29 @@ export default {
       inputAddres: 'inputAddres',
       cardData: 'cardData',
       separator2: 'separator2',
+      cartData: {},
+      allDataBuy: false,
     };
+  },
+  computed: {
+    isValidCard() {
+      console.log(' this.card:', this.card);
+      if (this.card) {
+        const indices = this.getIndicesOf('_', this.card);
+        console.log(' mystring:', indices);
+        if (indices.length === 0) {
+          return true;
+        }
+      }
+      return false;
+    },
+    isValidAddress() {
+      console.log(' this.address:', this.address.length);
+      if (this.address.length) {
+        return true;
+      }
+      return false;
+    },
   },
   created() {
     api.get('/cart/2').then((response) => {
@@ -99,6 +115,7 @@ export default {
       this.listProducts = response.data.product;
       this.dataLoaded = true;
       const urlProducts = [];
+      this.cartData = response.data;
       this.listProducts.forEach((idProduct) => {
         console.log('idProduct:', `/product/${this.idProduct}`);
         urlProducts.push(api.get(`/product/${idProduct}`));
@@ -120,6 +137,26 @@ export default {
     // this.loadData();
   },
   methods: {
+    getIndicesOf(searchStr, str, caseSensitive) {
+      const searchStrLen = searchStr.length;
+      if (searchStrLen === 0) {
+        return [];
+      }
+      let startIndex = 0;
+      let index = 0;
+      const indices = [];
+      if (!caseSensitive) {
+        str = str.toLowerCase();
+        searchStr = searchStr.toLowerCase();
+      }
+      // eslint-disable-next-line no-cond-assign
+      while ((index = str.indexOf(searchStr, startIndex)) > -1) {
+        indices.push(index);
+        startIndex = index + searchStrLen;
+      }
+      return indices;
+    },
+
     addCart(product) {
       console.log('cart');
       api.put('/cart/2', product)
@@ -128,8 +165,20 @@ export default {
         });
     },
     buyAction() {
-      this.showPayment = !this.showPayment;
-      // this.$router.push('/payment');
+      const objPostCart = {
+        id: this.cardData.id,
+        price: this.cartData.price,
+        address: this.address,
+        coupon: this.cartData.coupon,
+        product: [],
+      };
+      console.log('isValidCard: ', this.isValidCard);
+      if (this.isValidCard && this.isValidAddress) {
+        api.put('/cart/2/', objPostCart)
+          .then((response) => {
+            console.log('response: ', response);
+          });
+      }
     },
     onClickChild(value) {
       console.log('click el hijo');
