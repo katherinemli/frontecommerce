@@ -11,11 +11,8 @@
           @click="leftDrawerOpen = !leftDrawerOpen"
         /> -->
 
-        <q-toolbar-title @click="toIndex">
-          <q-avatar>
-            <q-icon :size="'md'" name="favorite" />
-          </q-avatar>
-          Katherine&TripElephant
+        <q-toolbar-title>
+          <q-btn flat  @click="toIndex" color="white" label="Katherine&TripElephant" />
         </q-toolbar-title>
 
         <div>
@@ -30,7 +27,8 @@
     </q-drawer>
     <q-page-container>
       <router-view
-       @updateProductCount="onClickAdd"/>
+       @updateProductCount="onClickAdd"
+       @deleteProductCount="onClickDelete"/>
     </q-page-container>
   </q-layout>
 </template>
@@ -101,6 +99,9 @@ export default {
     onClickAdd(value) {
       console.log('se agrego un producto', value);
       this.productInCart += value;
+    },
+    onClickDelete(value) {
+      this.productInCart -= value;
     },
     loadData() {
       api.get('/cart/2')

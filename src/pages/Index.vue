@@ -66,20 +66,23 @@ export default {
           console.log('error: ');
         });
     },
-    addCart(product) {
+    addCart(product, id) {
       console.log('cart');
       api.put('/cart/2/', product)
         .then((response) => {
+          this.cartData.product.push(id);
           this.$emit('updateProductCount', 1);
           console.log('response: ', response);
         });
     },
     onClickChild(value) {
       const productIds = [];
+      console.log(' this.cartData.product: ANTES', this.cartData.product);
       this.cartData.product.map((x) => {
         productIds.push(x);
         return x;
       });
+      console.log('this.productIdsBEFORE PUSH:', productIds);
       productIds.push(value);
       console.log('this.productIds:', productIds);
       const objPostProduct = {
@@ -89,7 +92,7 @@ export default {
         coupon: this.cartData.coupon,
         product: productIds,
       };
-      this.addCart(objPostProduct);
+      this.addCart(objPostProduct, value);
       console.log(objPostProduct, value); // someValue
     },
   },

@@ -3,19 +3,19 @@
 
     <q-list v-model="dataLoaded">
       <div v-for="product in productsData" :key="product.id">
-        <q-item v-if="product.inventory_left>0">
+        <q-item v-if="product.inventory_left > 0">
           <q-item-section>
             <q-item-label class="flex">
-              <q-icon name="delete" color="red" />
+              <q-icon @click="deleteElement(product.id)" name="delete" color="red" />
               <div>
                 {{ product.name }}
               </div>
-              </q-item-label>
+            </q-item-label>
             <q-item-label caption lines="2">
               {{ product.description }}
             </q-item-label>
             <q-item-label caption lines="2">
-              {{ product.inventory_left }}
+             Available items: {{ product.inventory_left }}
             </q-item-label>
           </q-item-section>
 
@@ -28,17 +28,16 @@
         <q-item v-else>
           <q-item-section>
             <q-item-label class="flex">
-              <q-icon name="delete" color="red" />
+              <q-icon name="delete" @click="deleteElement(product.id)" color="red" />
               <div>
                 {{ product.name }}
               </div>
-              </q-item-label>
+            </q-item-label>
             <q-item-label caption lines="2">
               {{ product.description }}
             </q-item-label>
             <q-item-label caption lines="2">
-             <div
-             class="text-overline text-red-9">No stock of this product.</div>
+              <div class="text-overline text-red-9">No stock of this product.</div>
             </q-item-label>
           </q-item-section>
 
@@ -60,19 +59,17 @@
       <q-item class="total-price">
         <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
       </q-item>
-      <transition-group appear enter-active-class="animated fadeIn"
-      leave-active-class="animated fadeOut">
+      <transition-group appear
+      enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
         <q-separator v-bind:key="separator" size="0.15rem" spaced inset />
         <q-item class="data-buy" v-bind:key="inputAddres">
           <q-input v-model="address"
-          :error="!isValidAddress"
-          error-message="Required" label="Address"
-            hint="Address" />
+          :error="!isValidAddress" error-message="Required" label="Address" hint="Address" />
         </q-item>
         <q-item class="data-buy" v-bind:key="cardData">
           <q-input v-model="card"
-          error-message="Required" :error="!isValidCard" label="Card"
-            mask="#### #### #### ####" fill-mask="" hint="Card Number" />
+          error-message="Required" :error="!isValidCard" label="Card" mask="#### #### #### ####"
+            fill-mask="" hint="Card Number" />
         </q-item>
         <q-separator v-bind:key="separator2" size="0.15rem" spaced inset />
 
@@ -80,8 +77,8 @@
       <q-item>
         <q-item-section class="body-btn-car">
           <q-btn outline color="primary" label="Store" />
-          <q-btn @click="buyAction" color="primary"
-          :disable="!isValidCard || !isValidAddress || buyOn"  label="Buy" />
+          <q-btn @click="buyAction"
+          color="primary" :disable="!isValidCard || !isValidAddress || buyOn" label="Buy" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -125,7 +122,7 @@ export default {
       if (this.card) {
         const indices = this.getIndicesOf('_', this.card);
         console.log(' mystring:', indices);
-        if (indices.length === 0) {
+        if (indices.length !== 0) {
           return true;
         }
       }
@@ -170,6 +167,34 @@ export default {
     // this.loadData();
   },
   methods: {
+    deleteElement(idProducto) {
+      this.totalPrice = 0;
+      console.log('idProducto', idProducto);
+      const productsDataId = this.productsData.filter(
+        (obj) => obj.id !== idProducto,
+      )
+        .map((obj) => {
+          this.totalPrice += obj.price;
+          return obj.id;
+        });
+      this.productsData = this.productsData.filter(
+        (obj) => obj.id !== idProducto,
+      );
+      const objPostCart = {
+        id: this.cartData.id,
+        price: this.cartData.price,
+        address: this.address,
+        coupon: this.cartData.coupon,
+        product: productsDataId,
+      };
+      console.log('productsData: ', objPostCart);
+      console.log('this.cardData.id: ', this.cartData.id);
+      api.put('/cart/2/', objPostCart)
+        .then((response) => {
+          console.log('response: ', response);
+          this.$emit('deleteProductCount', 1);
+        });
+    },
     getIndicesOf(searchStr, str, caseSensitive) {
       const searchStrLen = searchStr.length;
       if (searchStrLen === 0) {
@@ -200,7 +225,7 @@ export default {
     buyAction() {
       this.buyOn = true;
       const objPostCart = {
-        id: this.cardData.id,
+        id: this.cartData.id,
         price: this.cartData.price,
         address: this.address,
         coupon: this.cartData.coupon,
