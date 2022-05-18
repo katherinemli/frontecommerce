@@ -79,7 +79,7 @@
       </transition-group>
       <q-item>
         <q-item-section class="body-btn-car">
-          <q-btn outline color="primary" label="Store" />
+          <q-btn @click="toIndex" outline color="primary" label="Store" />
           <q-btn @click="buyAction" color="primary"
           :disable="!isValidCard || !isValidAddress || buyOn" label="Buy" />
         </q-item-section>
@@ -152,6 +152,9 @@ export default {
     this.asynCalls();
   },
   methods: {
+    toIndex() {
+      this.$router.push('/').catch(() => {});
+    },
     asynCalls() {
       api.get('/cart/2').then((response) => {
         console.log('axios1:', response);
@@ -204,7 +207,7 @@ export default {
       api.put('/cart/2/', objPostCart)
         .then((response) => {
           console.log('response: ', response);
-          this.$emit('deleteProductCount', 1);
+          this.$emit('deleteProductCount', this.productsData.length);
         });
     },
     getIndicesOf(searchStr, str, caseSensitive) {
@@ -292,6 +295,8 @@ export default {
             this.productsData = this.productsData.filter(
               (value) => value.inventory_left === 0,
             );
+            console.log('this.productsData.length: ', this.productsData.length);
+            this.$emit('deleteProductCount', this.productsData.length);
             // this.$router.push('/payment');
           });
       }

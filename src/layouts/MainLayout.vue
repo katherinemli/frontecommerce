@@ -101,7 +101,8 @@ export default {
       this.productInCart += value;
     },
     onClickDelete(value) {
-      this.productInCart -= value;
+      console.log('valor a restar:', value);
+      this.productInCart = value;
     },
     loadData() {
       api.get('/cart/2')
@@ -114,10 +115,10 @@ export default {
         });
     },
     toShoppingCart() {
-      this.$router.push('/cart');
+      this.$router.push('/cart').catch(() => {});
     },
     toIndex() {
-      this.$router.push('/');
+      this.$router.push('/').catch(() => {});
     },
   },
 };
