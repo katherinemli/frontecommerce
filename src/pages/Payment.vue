@@ -1,20 +1,47 @@
 <template>
   <q-page class="q-pa-md">
-    o input their name address and credit card (ex 4242-4242-4242-4242), let them click sub
-    <q-input bottom-slots v-model="text" label="Label" counter :dense="dense">
-      <template v-slot:prepend>
-        <q-icon name="place" />
-      </template>
-      <template v-slot:append>
-        <q-icon name="close" @click="text = ''" class="cursor-pointer" />
-      </template>
+    <q-list>
+      <div v-for="product in productsData" :key="product.id">
+        <q-item>
+          <q-item-section>
+            <q-item-label class="flex">
+              <q-icon @click="deleteElement(product.id)" name="delete" color="red" />
+              <div>
+                {{ product.name }}
+              </div>
+            </q-item-label>
+            <q-item-label caption lines="2">
+              {{ product.description }}
+            </q-item-label>
+            <q-item-label caption lines="2">
+             Available items: {{ product.inventory_left }}
+            </q-item-label>
+          </q-item-section>
 
-      <template v-slot:hint>
-        Field hint
-      </template>
-    </q-input>
-    <q-input v-model="card" label="Card" mask="#### #### #### ####" fill-mask="0"
-      hint="Card Number" />
+          <q-item-section side top>
+            <q-item-label caption>
+              ${{ product.price }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-separator spaced inset />
+      </div>
+      <q-item class="total-price">
+        <div v-if="coupon" style="float: right;" class="text-h7">{{ coupon }}%</div>
+        <div v-else style="float: right;" class="text-h7">Get Coupon</div>
+      </q-item>
+      <q-item class="total-price">
+        <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
+      </q-item>
+      <q-item class="total-price">
+        <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
+      </q-item>
+      <q-item>
+        <q-item-section class="body-btn-car">
+          <q-btn outline color="primary" label="Store" />
+        </q-item-section>
+      </q-item>
+    </q-list>
   </q-page>
 </template>
 
@@ -38,6 +65,7 @@ export default {
     };
   },
   created() {
+    this.interval = setInterval(() => this.getBitcoins(), 1000);
     api.get('/cart/2').then((response) => {
       console.log('axios1:', response);
       this.coupon = response.data.coupon;

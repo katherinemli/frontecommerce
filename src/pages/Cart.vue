@@ -15,7 +15,7 @@
               {{ product.description }}
             </q-item-label>
             <q-item-label caption lines="2">
-             Available items: {{ product.inventory_left }}
+              Available items: {{ product.inventory_left }}
             </q-item-label>
           </q-item-section>
 
@@ -49,26 +49,29 @@
         </q-item>
         <q-separator spaced inset />
       </div>
-      <q-item class="total-price">
-        <div v-if="coupon" style="float: right;" class="text-h7">{{ coupon }}%</div>
-        <div v-else style="float: right;" class="text-h7">Get Coupon</div>
+      <q-item v-if="cuponNanmeShow" class="total-price">
+        <q-input v-model="text"  :label="cuponNanme" hint="type name"  />
+      </q-item>
+      <q-item v-else class="total-price">
+        <q-spinner-hourglass
+          color="primary"
+          size="2em"
+        />
+        Wait for get a discount
       </q-item>
       <q-item class="total-price">
         <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
       </q-item>
-      <q-item class="total-price">
-        <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
-      </q-item>
-      <transition-group appear
-      enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+      <transition-group appear enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut">
         <q-separator v-bind:key="separator" size="0.15rem" spaced inset />
         <q-item class="data-buy" v-bind:key="inputAddres">
-          <q-input v-model="address"
-          :error="!isValidAddress" error-message="Required" label="Address" hint="Address" />
+          <q-input v-model="address" :error="!isValidAddress"
+           error-message="Required" label="Address" hint="Address" />
         </q-item>
         <q-item class="data-buy" v-bind:key="cardData">
-          <q-input v-model="card"
-          error-message="Required" :error="!isValidCard" label="Card" mask="#### #### #### ####"
+          <q-input v-model="card" error-message="Required"
+          :error="!isValidCard" label="Card" mask="#### #### #### ####"
             fill-mask="" hint="Card Number" />
         </q-item>
         <q-separator v-bind:key="separator2" size="0.15rem" spaced inset />
@@ -77,8 +80,8 @@
       <q-item>
         <q-item-section class="body-btn-car">
           <q-btn outline color="primary" label="Store" />
-          <q-btn @click="buyAction"
-          color="primary" :disable="!isValidCard || !isValidAddress || buyOn" label="Buy" />
+          <q-btn @click="buyAction" color="primary"
+          :disable="!isValidCard || !isValidAddress || buyOn" label="Buy" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -114,6 +117,8 @@ export default {
       cartData: {},
       allDataBuy: false,
       buyOn: false,
+      cuponNanme: '',
+      cuponNanmeShow: false,
     };
   },
   computed: {
@@ -136,37 +141,44 @@ export default {
       return false;
     },
   },
+  beforeDestory() {
+    clearInterval();
+  },
   created() {
-    api.get('/cart/2').then((response) => {
-      console.log('axios1:', response);
-      this.coupon = response.data.coupon;
-      this.listProducts = response.data.product;
-      this.dataLoaded = true;
-      const urlProducts = [];
-      this.cartData = response.data;
-      this.listProducts.forEach((idProduct) => {
-        console.log('idProduct:', `/product/${this.idProduct}`);
-        urlProducts.push(api.get(`/product/${idProduct}`));
-      });
-      this.$axios.all(urlProducts)
-        .then(this.$axios.spread((...responseProduct) => {
-          this.productsData = responseProduct.map((element) => {
-            console.log('elemn:', element);
-            if (element.data.inventory_left > 0) {
-              this.totalPrice += element.data.price;
-            }
-            return element.data;
-          });
-        }))
-        .catch((error) => {
-          console.error(error);
-        });
-    });
+    console.log('entro?');
+    this.interval = setInterval(() => this.getCoupon(), 15000);
   },
   beforeMount() {
-    // this.loadData();
+    this.asynCalls();
   },
   methods: {
+    asynCalls() {
+      api.get('/cart/2').then((response) => {
+        console.log('axios1:', response);
+        this.coupon = response.data.coupon;
+        this.listProducts = response.data.product;
+        this.dataLoaded = true;
+        const urlProducts = [];
+        this.cartData = response.data;
+        this.listProducts.forEach((idProduct) => {
+          console.log('idProduct:', `/product/${this.idProduct}`);
+          urlProducts.push(api.get(`/product/${idProduct}`));
+        });
+        this.$axios.all(urlProducts)
+          .then(this.$axios.spread((...responseProduct) => {
+            this.productsData = responseProduct.map((element) => {
+              console.log('elemn:', element);
+              if (element.data.inventory_left > 0) {
+                this.totalPrice += element.data.price;
+              }
+              return element.data;
+            });
+          }))
+          .catch((error) => {
+            console.error(error);
+          });
+      });
+    },
     deleteElement(idProducto) {
       this.totalPrice = 0;
       console.log('idProducto', idProducto);
@@ -223,6 +235,17 @@ export default {
           console.log('response: ', response);
         });
     },
+    getCoupon() {
+      console.log('cart');
+      const randomDiscount = Math.floor(Math.random() * (9 - 1 + 1) + 1);
+
+      api.get(`/coupon/${randomDiscount}`)
+        .then((response) => {
+          console.log('responseCOUPON: ', response);
+          this.cuponNanme = response.data.name;
+          this.cuponNanmeShow = true;
+        });
+    },
     inventoryAction() {
       const urlProducts = [];
       const productsDataId = this.productsData.filter(
@@ -269,6 +292,7 @@ export default {
             this.productsData = this.productsData.filter(
               (value) => value.inventory_left === 0,
             );
+            // this.$router.push('/payment');
           });
       }
     },
