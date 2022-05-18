@@ -50,30 +50,36 @@
         <q-separator spaced inset />
       </div>
       <q-item v-if="cuponNanmeShow" class="total-price">
-        <q-input
-        error-message="Required"
-        :error="!isValidCouponEntry" v-model="text" :label="cuponValue" hint="type name"  />
+        <q-input error-message="Required"
+        :error="!isValidCouponEntry" v-model="text" :label="cuponValue"
+          hint="type name" />
       </q-item>
       <q-item v-else class="total-price">
-        <q-spinner-hourglass
-          color="primary"
-          size="2em"
-        />
+        <q-spinner-hourglass color="primary" size="2em" />
         Wait for get a discount
+      </q-item>
+      <q-item v-if="isValidCouponEntry" class="total-price">
+        <div style="float: right;" class="text-h5">{{ totalPriceNoDiscount }}</div>
+        <q-item-label caption>
+          price before discount
+        </q-item-label>
       </q-item>
       <q-item class="total-price">
         <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
+        <q-item-label caption>
+          price after discount
+        </q-item-label>
       </q-item>
-      <transition-group appear enter-active-class="animated fadeIn"
-      leave-active-class="animated fadeOut">
+      <transition-group appear
+      enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
         <q-separator v-bind:key="separator" size="0.15rem" spaced inset />
         <q-item class="data-buy" v-bind:key="inputAddres">
-          <q-input v-model="address" :error="!isValidAddress"
-           error-message="Required" label="Address" hint="Address" />
+          <q-input v-model="address"
+          :error="!isValidAddress" error-message="Required" label="Address" hint="Address" />
         </q-item>
         <q-item class="data-buy" v-bind:key="cardData">
-          <q-input v-model="card" error-message="Required"
-          :error="!isValidCard" label="Card" mask="#### #### #### ####"
+          <q-input v-model="card"
+          error-message="Required" :error="!isValidCard" label="Card" mask="#### #### #### ####"
             fill-mask="" hint="Card Number" />
         </q-item>
         <q-separator v-bind:key="separator2" size="0.15rem" spaced inset />
@@ -82,8 +88,8 @@
       <q-item>
         <q-item-section class="body-btn-car">
           <q-btn @click="toIndex" outline color="primary" label="Store" />
-          <q-btn @click="buyAction" color="primary"
-          :disable="!isValidCard || !isValidAddress || buyOn" label="Buy" />
+          <q-btn @click="buyAction"
+          color="primary" :disable="!isValidCard || !isValidAddress || buyOn" label="Buy" />
         </q-item-section>
       </q-item>
     </q-list>
@@ -129,9 +135,7 @@ export default {
   watch: {
     // whenever question changes, this function will run
     text(newCoupon) {
-      console.log('cambio text wn wacssh:', newCoupon);
       if (newCoupon.length > 0) {
-        console.log('cambio text wn wach:', newCoupon);
         if (newCoupon === this.cuponValue) {
           this.totalPrice -= (
             this.totalPrice * this.discountApi
@@ -142,6 +146,10 @@ export default {
       } else {
         this.totalPrice = this.totalPriceNoDiscount;
       }
+    },
+    totalPrice() {
+      this.totalPrice = parseFloat(this.totalPrice).toFixed(2);
+      this.totalPriceNoDiscount = parseFloat(this.totalPriceNoDiscount).toFixed(2);
     },
   },
   computed: {
@@ -155,10 +163,8 @@ export default {
       return true;
     },
     isValidCard() {
-      console.log(' this.card:', this.card);
       if (this.card) {
         const indices = this.getIndicesOf('_', this.card);
-        console.log(' mystring:', indices);
         if (indices.length === 0) {
           return true;
         }
@@ -166,7 +172,6 @@ export default {
       return false;
     },
     isValidAddress() {
-      console.log(' this.address:', this.address.length);
       if (this.address.length) {
         return true;
       }
@@ -177,7 +182,6 @@ export default {
     clearInterval();
   },
   created() {
-    console.log('entro?');
     if (this.text.length === 0) {
       this.interval = setInterval(() => this.getCoupon(), 15000);
     }
@@ -187,24 +191,21 @@ export default {
   },
   methods: {
     toIndex() {
-      this.$router.push('/').catch(() => {});
+      this.$router.push('/').catch(() => { });
     },
     asynCalls() {
-      api.get('/cart/2').then((response) => {
-        console.log('axios1:', response);
+      api.get('/cart/1').then((response) => {
         this.coupon = response.data.coupon;
         this.listProducts = response.data.product;
         this.dataLoaded = true;
         const urlProducts = [];
         this.cartData = response.data;
         this.listProducts.forEach((idProduct) => {
-          console.log('idProduct:', `/product/${this.idProduct}`);
           urlProducts.push(api.get(`/product/${idProduct}`));
         });
         this.$axios.all(urlProducts)
           .then(this.$axios.spread((...responseProduct) => {
             this.productsData = responseProduct.map((element) => {
-              console.log('elemn:', element);
               if (element.data.inventory_left > 0) {
                 this.totalPrice += element.data.price;
                 this.totalPriceNoDiscount += element.data.price;
@@ -212,14 +213,12 @@ export default {
               return element.data;
             });
           }))
-          .catch((error) => {
-            console.error(error);
+          .catch(() => {
           });
       });
     },
     deleteElement(idProducto) {
       this.totalPrice = 0;
-      console.log('idProducto', idProducto);
       const productsDataId = this.productsData.filter(
         (obj) => obj.id !== idProducto,
       )
@@ -237,11 +236,8 @@ export default {
         coupon: this.cartData.coupon,
         product: productsDataId,
       };
-      console.log('productsData: ', objPostCart);
-      console.log('this.cardData.id: ', this.cartData.id);
-      api.put('/cart/2/', objPostCart)
-        .then((response) => {
-          console.log('response: ', response);
+      api.put('/cart/1/', objPostCart)
+        .then(() => {
           this.$emit('deleteProductCount', this.productsData.length);
         });
     },
@@ -264,22 +260,11 @@ export default {
       }
       return indices;
     },
-
-    addCart(product) {
-      console.log('cart');
-
-      api.put('/cart/2', product)
-        .then((response) => {
-          console.log('response: ', response);
-        });
-    },
     getCoupon() {
-      console.log('cart');
       const randomDiscount = Math.floor(Math.random() * (9 - 1 + 1) + 1);
 
       api.get(`/coupon/${randomDiscount}`)
         .then((response) => {
-          console.log('responseCOUPON: ', response);
           this.cuponValue = response.data.name;
           this.discountApi = response.data.discount;
           this.cuponNanmeShow = true;
@@ -295,14 +280,12 @@ export default {
           return obj.id;
         });
       productsDataId.forEach((idProduct) => {
-        console.log('idProduct:', `/product/${this.idProduct}/`);
         urlProducts.push(api.put(`/product/${idProduct}/`));
       });
       this.$axios.all(urlProducts)
         .then(this.$axios.spread(() => {
         }))
-        .catch((error) => {
-          console.error(error);
+        .catch(() => {
         });
     },
     buyAction() {
@@ -314,11 +297,17 @@ export default {
         coupon: this.cartData.coupon,
         product: [],
       };
-      console.log('isValidCard: ', this.isValidCard);
+      const paymentViewData = {
+        id: this.cartData.id,
+        price: this.totalPrice,
+        totalPriceNoDiscount: this.totalPriceNoDiscount,
+        address: this.address,
+        coupon: this.cartData.coupon,
+        product: this.productsData,
+      };
       if (this.isValidCard && this.isValidAddress) {
-        api.put('/cart/2/', objPostCart)
-          .then((response) => {
-            console.log('response: ', response);
+        api.put('/cart/1/', objPostCart)
+          .then(() => {
             this.buyOn = false;
             this.totalPrice = 0;
             this.inventoryAction();
@@ -331,23 +320,14 @@ export default {
             this.productsData = this.productsData.filter(
               (value) => value.inventory_left === 0,
             );
-            console.log('this.productsData.length: ', this.productsData.length);
             this.$emit('deleteProductCount', this.productsData.length);
             // this.$router.push('/payment');
-            this.$router.push({ name: 'payment', params: { title: 'test title' } });
+            this.$router.push({ name: 'payment', params: { productsData: paymentViewData } });
           });
       }
     },
-    onClickChild(value) {
-      console.log('click el hijo');
-      const objPostProduct = {
-        price: 159.90,
-        address: '712 Red Bark Lane in Henderson, Nevada',
-        product: 1,
-        coupon: 1,
-      };
+    onClickChild() {
       // this.addCart(objPostProduct);
-      console.log(objPostProduct, value); // someValue
     },
   },
 };

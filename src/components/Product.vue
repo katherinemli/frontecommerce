@@ -1,13 +1,13 @@
 <template>
     <q-card
        class="q-ma-sm cards-item">
-      <q-img src="https://cdn.quasar.dev/img/chicken-salad.jpg" />
+      <q-img src="https://source.unsplash.com/collection/54393494/480x480" />
 
       <q-card-section>
         <q-btn
           fab
-          color="primary"
-          icon="add_shopping_cart"
+          :color="color"
+          :icon="icon"
           class="absolute"
           @click="onClickButton"
           style="top: 0; right: 12px; transform: translateY(-50%);"
@@ -24,7 +24,7 @@
         </div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
+      <q-card-section class="name-cart q-pt-none">
         <div class="text-subtitle1">
          {{description}}
         </div>
@@ -70,12 +70,19 @@ export default {
   name: 'ProductCard',
   data() {
     return {
+      icon: 'add_shopping_cart',
+      color: 'primary',
     };
+  },
+  beforeMount() {
   },
   methods: {
     onClickButton() {
-      console.log('this.id', this.id);
-      this.$emit('clicked', this.id);
+      if (this.icon === 'add_shopping_cart') {
+        this.$emit('clicked', this.id);
+        this.icon = 'done';
+        this.color = 'secondary';
+      }
     },
 
   },

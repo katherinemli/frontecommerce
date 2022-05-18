@@ -12,7 +12,7 @@
         /> -->
 
         <q-toolbar-title>
-          <q-btn flat  @click="toIndex" color="white" label="Katherine&TripElephant" />
+          <q-btn flat @click="toIndex" color="white" label="Katherine&TripElephant" />
         </q-toolbar-title>
 
         <div>
@@ -26,9 +26,7 @@
       <!-- drawer content -->
     </q-drawer>
     <q-page-container>
-      <router-view
-       @updateProductCount="onClickAdd"
-       @deleteProductCount="onClickDelete"/>
+      <router-view @updateProductCount="onClickAdd" @deleteProductCount="onClickDelete" />
     </q-page-container>
   </q-layout>
 </template>
@@ -97,28 +95,24 @@ export default {
   },
   methods: {
     onClickAdd(value) {
-      console.log('se agrego un producto', value);
       this.productInCart += value;
     },
     onClickDelete(value) {
-      console.log('valor a restar:', value);
       this.productInCart = value;
     },
     loadData() {
-      api.get('/cart/2')
+      api.get('/cart/1')
         .then((response) => {
-          console.log('cartMainLayout Number:: ', response.data.product.length);
           this.productInCart = response.data.product.length;
         })
         .catch(() => {
-          console.log('error: ');
         });
     },
     toShoppingCart() {
-      this.$router.push('/cart').catch(() => {});
+      this.$router.push('/cart').catch(() => { });
     },
     toIndex() {
-      this.$router.push('/').catch(() => {});
+      this.$router.push('/').catch(() => { });
     },
   },
 };

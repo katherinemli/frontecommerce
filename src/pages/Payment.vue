@@ -1,16 +1,51 @@
 <template>
   <q-page class="q-pa-md">
-    props: {{title}}
+    <q-list>
+      <div v-for="product in productsData.product" :key="product.id">
+        <q-item v-if="product.inventory_left > 0">
+          <q-item-section>
+            <q-item-label class="flex">
+              <div class="name-cart">
+                {{ product.name }}
+              </div>
+            </q-item-label>
+            <q-item-label caption lines="2">
+              {{ product.description }}
+            </q-item-label>
+            <q-item-label caption lines="2">
+              Available items: {{ product.inventory_left }}
+            </q-item-label>
+          </q-item-section>
+
+          <q-item-section side top>
+            <q-item-label caption>
+              ${{ product.price }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-separator spaced inset />
+      </div>
+      <q-item class="total-price">
+        <div style="float: right;" class="text-h5">{{ productsData.price }}</div>
+        <q-item-label caption>
+          total price
+        </q-item-label>
+      </q-item>
+      <q-item>
+        <q-item-section class="body-btn-car">
+          <q-btn @click="toIndex" outline color="primary" label="Store" />
+        </q-item-section>
+      </q-item>
+    </q-list>
   </q-page>
 </template>
 
 <script>
-import { api } from 'boot/axios';
 
 const props = {
-  title: {
-    type: String,
-    default: 'connect',
+  productsData: {
+    type: Object,
+    default: {},
   },
 };
 export default {
@@ -19,7 +54,6 @@ export default {
   data() {
     return {
       listProducts: [],
-      productsData: [],
       dataLoaded: false,
       totalPrice: 0.0,
       coupon: 0.0,
@@ -31,51 +65,18 @@ export default {
     };
   },
   created() {
-    this.interval = setInterval(() => this.getBitcoins(), 1000);
-    api.get('/cart/2').then((response) => {
-      console.log('axios1:', response);
-      this.coupon = response.data.coupon;
-      this.listProducts = response.data.product;
-      this.dataLoaded = true;
-      const urlProducts = [];
-      this.listProducts.forEach((idProduct) => {
-        console.log('idProduct:', `/product/${this.idProduct}`);
-        urlProducts.push(api.get(`/product/${idProduct}`));
-      });
-      this.$axios.all(urlProducts)
-        .then(this.$axios.spread((...responseProduct) => {
-          this.productsData = responseProduct.map((element) => {
-            console.log('elemn:', element);
-            this.totalPrice += element.data.price;
-            return element.data;
-          });
-        }))
-        .catch((error) => {
-          console.error(error);
-        });
-    });
   },
   beforeMount() {
-    // this.loadData();
+    if (this.productsData
+      && Object.keys(this.productsData).length === 0
+      && Object.getPrototypeOf(this.productsData) === Object.prototype) {
+      this.$router.push('/').catch(() => { });
+    }
   },
   methods: {
-    addCart(product) {
-      console.log('cart');
-      api.put('/cart/2', product)
-        .then((response) => {
-          console.log('response: ', response);
-        });
-    },
-    onClickChild(value) {
-      console.log('click el hijo');
-      const objPostProduct = {
-        price: 159.90,
-        address: '712 Red Bark Lane in Henderson, Nevada',
-        product: 1,
-        coupon: 1,
-      };
-      // this.addCart(objPostProduct);
-      console.log(objPostProduct, value); // someValue
+
+    toIndex() {
+      this.$router.push('/').catch(() => { });
     },
   },
 };
