@@ -5,6 +5,12 @@
   min-height: 440px;
   flex: 1 0 21%;
 }
+.name-cart {
+  text-overflow: ellipsis;   /* IE, Safari (WebKit) */
+  overflow:hidden;              /* don't show excess chars */
+  white-space:nowrap;           /* force single line */
+  width: 20vw;
+}
 .shop-number {
   color: #fff;
 }

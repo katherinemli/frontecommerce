@@ -5,7 +5,10 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/Index.vue') },
       { path: '/cart', component: () => import('pages/Cart.vue') },
-      { path: '/payment', component: () => import('pages/Payment.vue') },
+      {
+        path: '/payment', component: () => import('pages/Payment.vue'), name: 'payment', props: true,
+      },
+
     ],
   },
 

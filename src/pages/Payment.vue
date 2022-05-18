@@ -1,54 +1,20 @@
 <template>
   <q-page class="q-pa-md">
-    <q-list>
-      <div v-for="product in productsData" :key="product.id">
-        <q-item>
-          <q-item-section>
-            <q-item-label class="flex">
-              <q-icon @click="deleteElement(product.id)" name="delete" color="red" />
-              <div>
-                {{ product.name }}
-              </div>
-            </q-item-label>
-            <q-item-label caption lines="2">
-              {{ product.description }}
-            </q-item-label>
-            <q-item-label caption lines="2">
-             Available items: {{ product.inventory_left }}
-            </q-item-label>
-          </q-item-section>
-
-          <q-item-section side top>
-            <q-item-label caption>
-              ${{ product.price }}
-            </q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-separator spaced inset />
-      </div>
-      <q-item class="total-price">
-        <div v-if="coupon" style="float: right;" class="text-h7">{{ coupon }}%</div>
-        <div v-else style="float: right;" class="text-h7">Get Coupon</div>
-      </q-item>
-      <q-item class="total-price">
-        <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
-      </q-item>
-      <q-item class="total-price">
-        <div style="float: right;" class="text-h5">{{ totalPrice }}</div>
-      </q-item>
-      <q-item>
-        <q-item-section class="body-btn-car">
-          <q-btn outline color="primary" label="Store" />
-        </q-item-section>
-      </q-item>
-    </q-list>
+    props: {{title}}
   </q-page>
 </template>
 
 <script>
 import { api } from 'boot/axios';
 
+const props = {
+  title: {
+    type: String,
+    default: 'connect',
+  },
+};
 export default {
+  props,
   name: 'Payment',
   data() {
     return {

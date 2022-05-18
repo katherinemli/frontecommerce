@@ -7,7 +7,7 @@
           <q-item-section>
             <q-item-label class="flex">
               <q-icon @click="deleteElement(product.id)" name="delete" color="red" />
-              <div>
+              <div class="name-cart">
                 {{ product.name }}
               </div>
             </q-item-label>
@@ -50,7 +50,9 @@
         <q-separator spaced inset />
       </div>
       <q-item v-if="cuponNanmeShow" class="total-price">
-        <q-input v-model="text"  :label="cuponNanme" hint="type name"  />
+        <q-input
+        error-message="Required"
+        :error="!isValidCouponEntry" v-model="text" :label="cuponValue" hint="type name"  />
       </q-item>
       <q-item v-else class="total-price">
         <q-spinner-hourglass
@@ -99,6 +101,7 @@ export default {
   name: 'Cart',
   data() {
     return {
+      discountApi: 1.0,
       listProducts: [],
       productsData: [],
       dataLoaded: false,
@@ -119,9 +122,36 @@ export default {
       buyOn: false,
       cuponNanme: '',
       cuponNanmeShow: false,
+      couponEntry: false,
+      totalPriceNoDiscount: 0,
     };
   },
+  watch: {
+    // whenever question changes, this function will run
+    text(newCoupon) {
+      console.log('cambio text wn wacssh:', newCoupon);
+      if (newCoupon.length > 0) {
+        console.log('cambio text wn wach:', newCoupon);
+        if (newCoupon === this.cuponValue) {
+          this.totalPrice *= this.discountApi;
+        } else {
+          this.totalPrice = this.totalPriceNoDiscount;
+        }
+      } else {
+        this.totalPrice = this.totalPriceNoDiscount;
+      }
+    },
+  },
   computed: {
+    isValidCouponEntry() {
+      if (this.text.length > 0) {
+        if (this.text === this.cuponValue) {
+          return true;
+        }
+        return false;
+      }
+      return true;
+    },
     isValidCard() {
       console.log(' this.card:', this.card);
       if (this.card) {
@@ -146,7 +176,9 @@ export default {
   },
   created() {
     console.log('entro?');
-    this.interval = setInterval(() => this.getCoupon(), 15000);
+    if (this.text.length === 0) {
+      this.interval = setInterval(() => this.getCoupon(), 15000);
+    }
   },
   beforeMount() {
     this.asynCalls();
@@ -173,6 +205,7 @@ export default {
               console.log('elemn:', element);
               if (element.data.inventory_left > 0) {
                 this.totalPrice += element.data.price;
+                this.totalPriceNoDiscount += element.data.price;
               }
               return element.data;
             });
@@ -245,7 +278,8 @@ export default {
       api.get(`/coupon/${randomDiscount}`)
         .then((response) => {
           console.log('responseCOUPON: ', response);
-          this.cuponNanme = response.data.name;
+          this.cuponValue = response.data.name;
+          this.discountApi = response.data.discount;
           this.cuponNanmeShow = true;
         });
     },
@@ -298,6 +332,7 @@ export default {
             console.log('this.productsData.length: ', this.productsData.length);
             this.$emit('deleteProductCount', this.productsData.length);
             // this.$router.push('/payment');
+            this.$router.push({ name: 'payment', params: { title: 'test title' } });
           });
       }
     },
