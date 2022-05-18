@@ -133,7 +133,9 @@ export default {
       if (newCoupon.length > 0) {
         console.log('cambio text wn wach:', newCoupon);
         if (newCoupon === this.cuponValue) {
-          this.totalPrice *= this.discountApi;
+          this.totalPrice -= (
+            this.totalPrice * this.discountApi
+          );
         } else {
           this.totalPrice = this.totalPriceNoDiscount;
         }
@@ -230,7 +232,7 @@ export default {
       );
       const objPostCart = {
         id: this.cartData.id,
-        price: this.cartData.price,
+        price: this.totalPrice,
         address: this.address,
         coupon: this.cartData.coupon,
         product: productsDataId,
