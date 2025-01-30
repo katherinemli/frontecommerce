@@ -1,31 +1,13 @@
-# Shop (ecommercefrontend)
+# Katherine Liberona Irarrázabal
 
-project for interview
+[katherine.lib.ira@gmail.com](mailto:katherine.lib.ira@gmail.com) | (438) 526-1448 | Ontario, Canada | Open Work Permit
 
-## Install the dependencies
-```bash
-yarn
-# or
-npm install
-```
+Full Stack Developer with 6 years of experience building scalable web applications and microservices. Specialized in performance optimization and large-scale data processing. Successfully delivered critical applications, including e-commerce logistics systems, emergency response platforms, and network management solutions for satellite communications.
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
-```bash
-quasar dev
-```
+## Technical Skills
 
-
-### Lint the files
-```bash
-yarn lint
-# or
-npm run lint
-```
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.conf.js](https://v1.quasar.dev/quasar-cli/quasar-conf-js).
+Frontend: Vue.js, Angular, CSS, Webpack, D3.js  
+Backend: Go, PHP, C, Django, Python  
+Core: Embedded Systems, Memory Management, Threading, Network Protocols  
+Data: MySQL, MongoDB, Real-time Processing, AI/ML Integration, GIS (Google Maps, Leaflet)  
+DevOps: Docker, AWS, Nginx, Git
