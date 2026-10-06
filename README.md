@@ -1,13 +1,21 @@
-# Katherine Liberona Irarrázabal
+# E-commerce Frontend (Quasar)
 
-[katherine.lib.ira@gmail.com](mailto:katherine.lib.ira@gmail.com) | (438) 526-1448 | Ontario, Canada | Open Work Permit
+Storefront for a small online shop: product listing, cart and payment pages, consuming the [backendecommerce](https://github.com/katherinemli/backendecommerce) REST API.
 
-Full Stack Developer with 6 years of experience building scalable web applications and microservices. Specialized in performance optimization and large-scale data processing. Successfully delivered critical applications, including e-commerce logistics systems, emergency response platforms, and network management solutions for satellite communications.
+## Highlights
+- Product catalog fetched from the API with Axios
+- Cart with parallel product requests (`axios.all`), coupon discounts and totals
+- Payment / checkout page
+- Quasar layout, i18n-ready
 
-## Technical Skills
+## Stack
+Vue 2 · Quasar · Axios · vue-i18n
 
-Frontend: React, Vue.js, Angular, CSS, Webpack, D3.js  
-Backend: Go, PHP, C, Django, Python  
-Core: Embedded Systems, Memory Management, Threading, Network Protocols  
-Data: MySQL, MongoDB, Real-time Processing, AI/ML Integration, GIS (Google Maps, Leaflet)  
-DevOps: Docker, AWS, Nginx, Git
+## Run locally
+```bash
+npm install
+npx quasar dev
+```
+
+---
+Katherine Liberona Irarrázabal · [github.com/katherinemli](https://github.com/katherinemli)
